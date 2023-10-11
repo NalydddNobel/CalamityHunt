@@ -2,6 +2,7 @@
 using CalamityHunt.Content.Bosses.Goozma.Projectiles;
 using CalamityHunt.Content.Items.Dyes;
 using CalamityHunt.Content.Items.Misc;
+using CalamityHunt.Content.Items.Misc.AuricSouls;
 using CalamityHunt.Content.Pets.BloatBabyPet;
 using CalamityHunt.Content.Projectiles;
 using CalamityHunt.Content.Projectiles.Weapons.Magic;
@@ -26,6 +27,15 @@ namespace CalamityHunt.Common.Systems
 {
     public class GoozmaSystem : ModSystem
     {
+        public static int GoozmaBossIndex;
+        public static int GoozmaAuricSoulItemIndex;
+
+        public override void ClearWorld()
+        {
+            GoozmaBossIndex = -1;
+            GoozmaAuricSoulItemIndex = -1;
+        }
+
         public override void PostUpdateNPCs()
         {
             GoozmaSpawningOld();
@@ -40,6 +50,8 @@ namespace CalamityHunt.Common.Systems
                     Filters.Scene["HuntOfTheOldGods:StellarBlackHole"].Deactivate();
                 }
             }
+            GoozmaBossIndex = NPC.FindFirstNPC(ModContent.NPCType<Goozma>());
+            GoozmaAuricSoulItemIndex = HuntOfTheOldGodUtils.FindFirstItem(ModContent.ItemType<GoozmaAuricSoul>());
         }
 
         public static void GoozmaEgg(Vector2 position)

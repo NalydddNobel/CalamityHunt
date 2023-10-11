@@ -210,7 +210,6 @@ namespace CalamityHunt.Content.Bosses.Goozma
         {
             Asset<Texture2D> wormhole = AssetDirectory.Textures.Goozma.Wormhole;
             Main.EntitySpriteDraw(wormhole.Value, position - Main.screenPosition, null, innerColor, rotation, wormhole.Size() * 0.5f, scale * 2f, 0, 0);
-
         }
     }
 }

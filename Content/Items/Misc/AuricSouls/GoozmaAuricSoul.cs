@@ -20,6 +20,7 @@ using Terraria.Graphics;
 using Terraria.ID;
 using Terraria.ModLoader;
 using static System.Net.Mime.MediaTypeNames;
+using CalamityHunt.Content.Chroma;
 
 namespace CalamityHunt.Content.Items.Misc.AuricSouls
 {
@@ -102,8 +103,8 @@ namespace CalamityHunt.Content.Items.Misc.AuricSouls
         public override void Update(ref float gravity, ref float maxFallSpeed)
         {
             if (heartbeatSound == null)
-                heartbeatSound = new LoopingSound(AssetDirectory.Sounds.GoozmaAuricSoulHeartbeat, new HuntOfTheOldGodUtils.ItemAudioTracker(Item).IsActiveAndInGame);
-            heartbeatSound.Update(() => Item.position, () => 1f, () => 0f);
+                heartbeatSound = new LoopingSound(AssetDirectory.Sounds.GoozmaAuricSoulHeartbeat with { IsLooped = false }, new HuntOfTheOldGodUtils.ItemAudioTracker(Item).IsActiveAndInGame);
+            heartbeatSound.Update(() => Item.position, () => 1f, () => 0f, () => GoozmaAuricSoulShader.Pulse = 1f);
 
             if (droneSound == null)
                 droneSound = new LoopingSound(AssetDirectory.Sounds.GoozmaAuricSoulDrone, new HuntOfTheOldGodUtils.ItemAudioTracker(Item).IsActiveAndInGame);

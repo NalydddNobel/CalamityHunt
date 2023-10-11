@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 using ReLogic.Utilities;
+using Terraria;
 using Terraria.Audio;
 
 namespace CalamityHunt.Core;
@@ -18,7 +19,7 @@ public class LoopingSound
         slot = SlotId.Invalid;
     }
 
-    public void Update(Func<Vector2> position, Func<float> volume, Func<float> pitch)
+    public void Update(Func<Vector2> position, Func<float> volume, Func<float> pitch, Action onReset = null)
     {
         bool active = SoundEngine.TryGetActiveSound(slot, out ActiveSound activeSound);
 
@@ -31,10 +32,13 @@ public class LoopingSound
                     sound.Position = position.Invoke();
                     sound.Volume = volume.Invoke();
                     sound.Pitch = pitch.Invoke();
+                    if (onReset != null)
+                    {
+                    }
                 }
-
                 return condition.Invoke();
             });
+            onReset?.Invoke();
         }
 
         if (active)

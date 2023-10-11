@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Utilities;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
@@ -13,6 +14,18 @@ namespace CalamityHunt
 {
     public static class HuntOfTheOldGodUtils
     {
+        public static int FindFirstItem(int type)
+        {
+            for (int i = 0; i < Main.maxItems; i++)
+            {
+                if (Main.item[i].active && Main.item[i].type == type)
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
         public static Vector2 GetDesiredVelocityForDistance(Vector2 start, Vector2 end, float slowDownFactor, int time)
         {
             Vector2 velocity = start.DirectionTo(end).SafeNormalize(Vector2.Zero);
