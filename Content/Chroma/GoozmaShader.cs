@@ -349,6 +349,25 @@ namespace CalamityHunt.Content.Chroma
                                 }
                             }
                         }
+                        var projectile = FindProjectile(ModContent.ProjectileType<HolyExplosion>());
+                        float holyExplosionTime = 60f;
+                        if (projectile != null && projectile.ai[0] < holyExplosionTime)
+                        {
+                            float intensity = 0f;
+                            float introTime = 7f;
+                            if (projectile.ai[0] < 7f)
+                            {
+                                intensity = MathF.Sin(projectile.ai[0] / introTime * MathHelper.PiOver2);
+                            }
+                            else
+                            {
+                                intensity = 1f - MathF.Pow((projectile.ai[0] - introTime) / (holyExplosionTime - introTime), 5f);
+                            }
+                            for (int i = 0; i < fragment.Count; i++)
+                            {
+                                fragment.SetColor(i, Vector4.Lerp(fragment.Colors[i], Color.White.ToVector4(), intensity));
+                            }
+                        }
                     }
                     break;
 
@@ -369,28 +388,17 @@ namespace CalamityHunt.Content.Chroma
                                 fragment.SetColor(i, Vector4.Lerp(fragment.Colors[i], new Vector4(1f, 0.5f, 0f, 1f), Math.Min(-yDistance, 1f)));
                             }
                         }
+
+                        var projectile = FindProjectile(ModContent.ProjectileType<BlackHoleBlender>());
+                        if (projectile != null)
+                        {
+                            for (int i = 0; i < fragment.Count; i++)
+                            {
+                                fragment.SetColor(i, Vector4.Lerp(fragment.Colors[i], Color.Black.ToVector4(), 1f));
+                            }
+                        }
                     }
                     break;
-            }
-
-            var projectile = FindProjectile(ModContent.ProjectileType<HolyExplosion>());
-            float holyExplosionTime = 60f;
-            if (projectile != null && projectile.ai[0] < holyExplosionTime)
-            {
-                float intensity = 0f;
-                float introTime = 7f;
-                if (projectile.ai[0] < 7f)
-                {
-                    intensity = MathF.Sin(projectile.ai[0] / introTime * MathHelper.PiOver2);
-                }
-                else
-                {
-                    intensity = 1f - MathF.Pow((projectile.ai[0] - introTime) / (holyExplosionTime - introTime), 5f);
-                }
-                for (int i = 0; i < fragment.Count; i++)
-                {
-                    fragment.SetColor(i, Vector4.Lerp(fragment.Colors[i], Color.White.ToVector4(), intensity));
-                }
             }
         }
 
@@ -400,9 +408,13 @@ namespace CalamityHunt.Content.Chroma
             Vector2 center = fragment.CanvasCenter;
             center += time.ToRotationVector2() * MathF.Sin(time * (float)Math.E) * pulseSpeed;
             // Screen Shake effect, deemed too 'buggy looking'
-            //Vector2 cameraShakeVector = Main.screenPosition;
-            //Main.instance.CameraModifiers.ApplyTo(ref cameraShakeVector);
-            //center += (Main.screenPosition - cameraShakeVector) * 0.05f;
+            // Now thrown into FTW and GFB seeds for funnies
+            if (Main.getGoodWorld)
+            {
+                Vector2 cameraShakeVector = Main.screenPosition;
+                Main.instance.CameraModifiers.ApplyTo(ref cameraShakeVector);
+                center += (Main.screenPosition - cameraShakeVector) * 0.05f;
+            }
 
             DrawPulse(center, device, fragment, quality, time);
             DrawLaserAura(center, device, fragment, quality, time);

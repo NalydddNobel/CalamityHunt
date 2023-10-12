@@ -28,7 +28,7 @@ namespace CalamityHunt.Content.Chroma
         {
             if (Pulse > 0f)
             {
-                Pulse -= 0.04f;
+                Pulse -= 0.035f;
                 if (Pulse < 0f)
                 {
                     Pulse = 0f;
@@ -45,7 +45,11 @@ namespace CalamityHunt.Content.Chroma
         private void DrawPulse(Vector2 center, RgbDevice device, Fragment fragment, EffectDetailLevel quality, float time)
         {
             float intensity = Pulse;
-            if (intensity < 0.6f)
+            if (intensity > 0.9f)
+            {
+                intensity = 1f - (intensity - 0.9f) / 0.1f;
+            }
+            else if (intensity < 0.6f)
             {
                 intensity /= 0.6f;
             }
