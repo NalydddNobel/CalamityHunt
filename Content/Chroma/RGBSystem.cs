@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using CalamityHunt.Common.Systems;
-using CalamityHunt.Content.Items.Misc.AuricSouls;
+using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Peripherals.RGB;
 using Terraria;
 using Terraria.GameContent.RGB;
@@ -76,5 +76,17 @@ namespace CalamityHunt.Content.Chroma
         }
 
         #endregion
+
+#if DEBUG
+        public override void PostDrawInterface(SpriteBatch spriteBatch)
+        {
+            if (Main.drawDiag)
+            {
+                Main.DebugDrawer.Begin(Main.UIScaleMatrix);
+                Main.Chroma.DebugDraw(Main.DebugDrawer, Main.MouseScreen, 100f);
+                Main.DebugDrawer.End();
+            }
+        }
+#endif
     }
 }

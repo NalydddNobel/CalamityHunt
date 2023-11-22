@@ -23,16 +23,18 @@ namespace CalamityHunt.Content.Chroma
 
         public enum ShaderState
         {
-            Normal = 0,
-            Laser = 1,
-            CrimsonSlime = 2,
-            CorruptionSlime = 3,
-            HallowedSlime = 4,
-            AstralSlime = 5,
-            TOUCHME = 6,
-            PhaseTransition = 7,
-            Entrance = 8,
-            Death = 9
+            Normal,
+            Laser,
+            CrimsonSlime,
+            CorruptionSlime,
+            HallowedSlime,
+            AstralSlime,
+            TOUCHME,
+            HolyExplosion,
+            Black,
+            PhaseTransition,
+            Entrance,
+            Death
         }
 
         private static Vector3[] _colorMap;
@@ -92,6 +94,10 @@ namespace CalamityHunt.Content.Chroma
                     {
                         state = ShaderState.TOUCHME;
                     }
+                    else if (FindProjectile(ModContent.ProjectileType<HolyExplosion>()) != null)
+                    {
+                        state = ShaderState.HolyExplosion;
+                    }
                     else
                     {
                         state = ShaderState.HallowedSlime;
@@ -100,7 +106,14 @@ namespace CalamityHunt.Content.Chroma
                 }
                 else if (activeSlime.ModNPC is StellarGeliath)
                 {
-                    state = ShaderState.AstralSlime;
+                    if (FindProjectile(ModContent.ProjectileType<BlackHoleBlender>()) != null)
+                    {
+                        state = ShaderState.Black;
+                    }
+                    else
+                    {
+                        state = ShaderState.AstralSlime;
+                    }
                     return;
                 }
             }
@@ -192,7 +205,8 @@ namespace CalamityHunt.Content.Chroma
 
         private void DrawSlimeAura(Vector2 center, RgbDevice device, Fragment fragment, EffectDetailLevel quality, float time)
         {
-            switch (state) {
+            switch (state) 
+            {
                 case ShaderState.CrimsonSlime:
                     {
                         for (int i = 0; i < fragment.Count; i++)
@@ -225,7 +239,7 @@ namespace CalamityHunt.Content.Chroma
                 case ShaderState.CorruptionSlime:
                     {
                         //Terraria.GameContent.RGB.UndergroundMushroomShader
-                        var corruptionColor = new Vector4(0.3f, 0.1f, 0.8f, 1f);
+                        var corruptionColor = new Vector4(0.45f, 0.1f, 1f, 1f);
                         for (int i = 0; i < fragment.Count; i++)
                         {
                             Point keyPosition = fragment.GetGridPositionOfIndex(i);
@@ -252,6 +266,7 @@ namespace CalamityHunt.Content.Chroma
                     }
                     break;
 
+                case ShaderState.HolyExplosion:
                 case ShaderState.TOUCHME:
                 case ShaderState.HallowedSlime:
                     {
@@ -259,11 +274,11 @@ namespace CalamityHunt.Content.Chroma
                         {
                             Vector2 keyPosition = fragment.GetCanvasPositionOfIndex(i);
                             Vector2 difference = keyPosition - center;
-                            float yDistance = Math.Abs(difference.Y * 1.5f);
+                            float yDistance = Math.Abs(difference.Y * 1.5f) + MathF.Sin(difference.X * 5f + time * 5f) * 0.33f;
 
                             if (yDistance < 1f)
                             {
-                                fragment.SetColor(i, Vector4.Lerp(fragment.Colors[i], new Vector4(1f, 0.7f, 1f, 1f), Math.Min(1f - yDistance, 1f) * 0.6f));
+                                fragment.SetColor(i, Vector4.Lerp(fragment.Colors[i], new Vector4(1f, 0.5f, 1f, 1f), Math.Clamp(1f - yDistance * 2f, 0f, 1f) * 0.4f));
                             }
                         }
                         if (state == ShaderState.TOUCHME)
@@ -349,23 +364,26 @@ namespace CalamityHunt.Content.Chroma
                                 }
                             }
                         }
-                        var projectile = FindProjectile(ModContent.ProjectileType<HolyExplosion>());
-                        float holyExplosionTime = 60f;
-                        if (projectile != null && projectile.ai[0] < holyExplosionTime)
+                        if (state == ShaderState.HolyExplosion)
                         {
-                            float intensity = 0f;
-                            float introTime = 7f;
-                            if (projectile.ai[0] < 7f)
+                            var projectile = FindProjectile(ModContent.ProjectileType<HolyExplosion>());
+                            float holyExplosionTime = 60f;
+                            if (projectile != null && projectile.ai[0] < holyExplosionTime)
                             {
-                                intensity = MathF.Sin(projectile.ai[0] / introTime * MathHelper.PiOver2);
-                            }
-                            else
-                            {
-                                intensity = 1f - MathF.Pow((projectile.ai[0] - introTime) / (holyExplosionTime - introTime), 5f);
-                            }
-                            for (int i = 0; i < fragment.Count; i++)
-                            {
-                                fragment.SetColor(i, Vector4.Lerp(fragment.Colors[i], Color.White.ToVector4(), intensity));
+                                float intensity = 0f;
+                                float introTime = 7f;
+                                if (projectile.ai[0] < 7f)
+                                {
+                                    intensity = MathF.Sin(projectile.ai[0] / introTime * MathHelper.PiOver2);
+                                }
+                                else
+                                {
+                                    intensity = 1f - MathF.Pow((projectile.ai[0] - introTime) / (holyExplosionTime - introTime), 5f);
+                                }
+                                for (int i = 0; i < fragment.Count; i++)
+                                {
+                                    fragment.SetColor(i, Vector4.Lerp(fragment.Colors[i], Color.White.ToVector4(), intensity));
+                                }
                             }
                         }
                     }
@@ -388,14 +406,14 @@ namespace CalamityHunt.Content.Chroma
                                 fragment.SetColor(i, Vector4.Lerp(fragment.Colors[i], new Vector4(1f, 0.5f, 0f, 1f), Math.Min(-yDistance, 1f)));
                             }
                         }
+                    }
+                    break;
 
-                        var projectile = FindProjectile(ModContent.ProjectileType<BlackHoleBlender>());
-                        if (projectile != null)
+                case ShaderState.Black:
+                    {
+                        for (int i = 0; i < fragment.Count; i++)
                         {
-                            for (int i = 0; i < fragment.Count; i++)
-                            {
-                                fragment.SetColor(i, Vector4.Lerp(fragment.Colors[i], Color.Black.ToVector4(), 1f));
-                            }
+                            fragment.SetColor(i, Vector4.Lerp(fragment.Colors[i], Color.Black.ToVector4(), 1f));
                         }
                     }
                     break;

@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Graphics;
 using Terraria;
+using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace Aequus.Unused.Items.DebugItems;
@@ -109,6 +110,9 @@ public class RGBKeyboardItem : ModItem
         return false;
 #endif
     }
+
+    public override LocalizedText DisplayName => Language.GetText("RGB Keyboard Tester");
+    public override LocalizedText Tooltip => Language.GetText("Tests RGB effects with a cool preview thingy! Delete this later.");
 
     public override void SetStaticDefaults()
     {
